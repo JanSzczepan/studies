@@ -1,0 +1,3 @@
+/Users/johnkot/School/Programowanie/Zadania dodatkowe/Zadanie1/cmake-build-debug/CMakeFiles/Zadanie1.dir
+/Users/johnkot/School/Programowanie/Zadania dodatkowe/Zadanie1/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/johnkot/School/Programowanie/Zadania dodatkowe/Zadanie1/cmake-build-debug/CMakeFiles/rebuild_cache.dir

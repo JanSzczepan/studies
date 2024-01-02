@@ -27,7 +27,7 @@
 					[
 						0
 					],
-					"name" : "Zadanie2",
+					"name" : "Zadanie3",
 					"targetIndexes" : 
 					[
 						0
@@ -38,9 +38,9 @@
 			[
 				{
 					"directoryIndex" : 0,
-					"id" : "Zadanie2::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-Zadanie2-Debug-dacda5025db685db95a9.json",
-					"name" : "Zadanie2",
+					"id" : "Zadanie3::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Zadanie3-Debug-935ff161fc9c45194a0b.json",
+					"name" : "Zadanie3",
 					"projectIndex" : 0
 				}
 			]
@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/Users/johnkot/School/Programowanie/Zadania dodatkowe/Zadanie2/cmake-build-debug",
-		"source" : "/Users/johnkot/School/Programowanie/Zadania dodatkowe/Zadanie2"
+		"build" : "/Users/johnkot/School/School/Programowanie/Zadania dodatkowe/Zadanie3/cmake-build-debug",
+		"source" : "/Users/johnkot/School/School/Programowanie/Zadania dodatkowe/Zadanie3"
 	},
 	"version" : 
 	{

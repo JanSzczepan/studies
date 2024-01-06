@@ -11,7 +11,7 @@ struct Book {
     Book *next{};
 };
 
-const int N = 4;
+const int N = 6;
 
 void getDivider() {
     cout << "-------------------" << endl;
@@ -69,26 +69,27 @@ int main() {
     };
     Book *deleteHead = head;
     Book *prevBook = new Book;
+    int prevPagesCount = 0;
     int i = 0;
     while (i < randNumOfBooks && deleteHead != nullptr) {
         current = deleteHead;
 
-        if (isBookToDelete(current, prevBook->pagesCount) && head == current) {
-            deleteHead = head->next;
-            head = head->next;
-            prevBook = current;
-            cout << "Deleting Book: " << current->title << endl;
-            delete current;
-            i++;
-        } else if (isBookToDelete(current, prevBook->pagesCount)) {
-            prevBook->next = deleteHead->next;
-            deleteHead = deleteHead->next;
-            prevBook = current;
+        if (isBookToDelete(current, prevPagesCount)) {
+            if (head == current) {
+                deleteHead = head->next;
+                head = head->next;
+            } else {
+                prevBook->next = deleteHead->next;
+                deleteHead = deleteHead->next;
+            }
+
+            prevPagesCount = current->pagesCount;
             cout << "Deleting Book: " << current->title << endl;
             delete current;
             i++;
         } else {
             prevBook = current;
+            prevPagesCount = current->pagesCount;
             deleteHead = deleteHead->next;
         }
     }

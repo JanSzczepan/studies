@@ -44,31 +44,29 @@ void moveAndCreateListItem(Book *&head, Book &newBookData, ExclusionChars exclus
 
     Book *current = head;
     Book *prev = nullptr;
-    int index = 1;
+    int index = 0; // Zmieniono na 0, aby uwzględnić pierwszy element
 
-
-    while (current != nullptr && current->next != nullptr) {
+    while (current != nullptr) {
         if (index % moveInterval == 0 &&
-            current->next->pagesCount % 2 == 0 &&
-            current->next->authorName.find(charToAvoidInAuthorsName) == string::npos) {
+            current->pagesCount % 2 == 0 &&
+            current->title.find(charToAvoidInTitle) == string::npos) {
 
-            cout << "Book to be moved: " << current->next->title << endl;
+            cout << "Book to be moved: " << current->title << endl;
             cout << "Enter element index: ";
             int userIndex;
             cin >> userIndex;
 
-            if (current->next != nullptr && current->next->next == nullptr && userIndex >= index) {
-                // Książka jest ostatnia, nie robimy nic
-                prev = current;
-                current = current->next;
-                index++;
-                continue;
+            Book *toMove = current;
+            Book *nextNode = current->next;
+
+            if (prev != nullptr) {
+                prev->next = nextNode;  // Odłączamy książkę od obecnej pozycji
+            } else {
+                head = nextNode;  // Aktualizujemy głowę, jeśli przenosimy pierwszy element
             }
 
-            // Specjalny przypadek dla 1 lub 2
-            if (userIndex <= 2) {
-                Book *toMove = current->next;
-                current->next = toMove->next;
+            if (userIndex <= 1) {
+                // Przenosimy na początek
                 toMove->next = head;
                 head = toMove;
             } else {
@@ -78,34 +76,25 @@ void moveAndCreateListItem(Book *&head, Book &newBookData, ExclusionChars exclus
                     movePrev = movePrev->next;
                 }
 
-                // Jeśli doszliśmy do końca listy, przenosimy na koniec
-                if (movePrev->next == nullptr) {
-                    Book *toMove = current->next;
-                    current->next = toMove->next;
-                    movePrev->next = toMove;
-                    toMove->next = nullptr;
-                } else {
-                    // Przenoszenie książki
-                    Book *toMove = current->next;
-                    current->next = toMove->next;
-                    toMove->next = movePrev->next;
-                    movePrev->next = toMove;
-                }
+                toMove->next = movePrev->next;
+                movePrev->next = toMove;
             }
 
-            // Aktualizacja wskaźników
-            if (current == head) {
-                current = head;
-            } else {
-                current = current->next;
-            }
             printList(head);
+
+            if (prev != nullptr) {
+                current = prev->next;  // Kontynuujemy od poprzedniego elementu
+            } else {
+                current = head;  // Jeśli przeniesiono pierwszy element, zaczynamy od nowej głowy
+            }
         } else {
             prev = current;
             current = current->next;
-            index++;
         }
+        index++;
     }
+
+
     cout << "---------------" << endl;
 
     current = head;
@@ -154,7 +143,7 @@ int main() {
     printList(head);
 
     Book b = Book{10, "TestTitle", "Test", "Test"};
-    moveAndCreateListItem(head, b, {'q', 'a'}, 1);
+    moveAndCreateListItem(head, b, {'[', '['}, 3);
 
     while (head != nullptr) {
         Book *temp = head;

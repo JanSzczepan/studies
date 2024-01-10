@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
 
 using namespace std;
 
@@ -16,13 +17,27 @@ struct ExclusionChars {
     char charToAvoidInAuthorsName;
 };
 
+const int LIST_START_INDEX = 1;
+const int MOVE_BOOK_INTERVAL = 2;
+const char CHAR_TO_AVOID_IN_TITLE = 'q';
+const char CHAR_TO_AVOID_IN_AUTHORS_NAME = 'J';
+
+void getDivider() {
+    cout << "----------------" << endl;
+}
+
 void printElement(Book *&book) {
     cout << book->title << " by " << book->authorName << " " << book->authorSurname << endl;
 }
 
-void printList(Book *&head) {
+void printList(Book *&head, const string &prompt) {
+    if (head == nullptr) return;
+
+    cout << prompt << endl;
+    getDivider();
     for (Book *book = head; book != nullptr; book = book->next)
         printElement(book);
+    getDivider();
 }
 
 void addBookToList(Book *&head, Book &book) {
@@ -39,85 +54,102 @@ void addBookToList(Book *&head, Book &book) {
     }
 }
 
-void moveAndCreateListItem(Book *&head, Book &newBookData, ExclusionChars exclusionChars, const short moveInterval) {
-    auto [charToAvoidInTitle, charToAvoidInAuthorsName] = exclusionChars;
+template<typename T>
+void removeElement(T *&head, T *elementToRemove) {
+    if (head == nullptr || elementToRemove == nullptr) return;
+
+    if (elementToRemove == head) {
+        head = head->next;
+        return;
+    }
+
+    T *temp = head;
+    while (temp != nullptr && temp->next != elementToRemove) {
+        temp = temp->next;
+    }
+
+    if (temp != nullptr) {
+        temp->next = elementToRemove->next;
+    }
+}
+
+template<typename T>
+void insertElement(T *&head, T *elementToInsert, int position) {
+    if (elementToInsert == nullptr) return;
+
+    if (position <= LIST_START_INDEX || head == nullptr) {
+        elementToInsert->next = head;
+        head = elementToInsert;
+        return;
+    }
+
+    T *temp = head;
+    for (int i = LIST_START_INDEX; i < position - 1 && temp->next != nullptr; i++) {
+        temp = temp->next;
+    }
+    elementToInsert->next = temp->next;
+    temp->next = elementToInsert;
+}
+
+template<typename T>
+void moveElement(T *&head, T *elementToMove, int newPosition) {
+    if (elementToMove == nullptr) return;
+
+    removeElement<T>(head, elementToMove);
+    insertElement<T>(head, elementToMove, newPosition - 1);
+}
+
+void moveAndCreateListItem(Book *&head, Book &newBook, ExclusionChars exclusionChars, const short moveInterval) {
+    auto isBookToMove = [moveInterval, exclusionChars](Book *book, int &movedBooksCount) -> bool {
+        bool isEvenNumberOfPages = book->pagesCount % 2 == 0;
+        bool isTitleWithoutExcludedChar = book->title.find(exclusionChars.charToAvoidInTitle) == string::npos;
+        bool isDividendByInterval = movedBooksCount % moveInterval == 0;
+
+        if (isEvenNumberOfPages && isTitleWithoutExcludedChar)
+            movedBooksCount++;
+
+        return (isDividendByInterval && isEvenNumberOfPages && isTitleWithoutExcludedChar);
+    };
 
     Book *current = head;
-    Book *prev = nullptr;
-    int index = 0; // Zmieniono na 0, aby uwzględnić pierwszy element
-
+    int movedBooksCount = 0;
     while (current != nullptr) {
-        if (index % moveInterval == 0 &&
-            current->pagesCount % 2 == 0 &&
-            current->title.find(charToAvoidInTitle) == string::npos) {
+        Book *next = current->next;
 
+        if (isBookToMove(current, movedBooksCount)) {
             cout << "Book to be moved: " << current->title << endl;
             cout << "Enter element index: ";
             int userIndex;
             cin >> userIndex;
-
-            Book *toMove = current;
-            Book *nextNode = current->next;
-
-            if (prev != nullptr) {
-                prev->next = nextNode;  // Odłączamy książkę od obecnej pozycji
-            } else {
-                head = nextNode;  // Aktualizujemy głowę, jeśli przenosimy pierwszy element
-            }
-
-            if (userIndex <= 1) {
-                // Przenosimy na początek
-                toMove->next = head;
-                head = toMove;
-            } else {
-                // Wyszukujemy miejsce do przeniesienia
-                Book *movePrev = head;
-                for (int i = 1; i < userIndex - 1 && movePrev->next != nullptr; i++) {
-                    movePrev = movePrev->next;
-                }
-
-                toMove->next = movePrev->next;
-                movePrev->next = toMove;
-            }
-
-            printList(head);
-
-            if (prev != nullptr) {
-                current = prev->next;  // Kontynuujemy od poprzedniego elementu
-            } else {
-                current = head;  // Jeśli przeniesiono pierwszy element, zaczynamy od nowej głowy
-            }
-        } else {
-            prev = current;
-            current = current->next;
+            moveElement(head, current, userIndex);
+            printList(head, "Book moved:");
         }
-        index++;
+
+        current = next;
     }
 
-
-    cout << "---------------" << endl;
+    auto isNewBookToAdd = [exclusionChars](Book *current) -> bool {
+        return current->authorName.find(exclusionChars.charToAvoidInAuthorsName) == string::npos;
+    };
 
     current = head;
-    Book *previous = nullptr;
-
+    int index = LIST_START_INDEX;
     while (current != nullptr) {
-        // Sprawdzenie, czy aktualna książka spełnia warunek do dodania nowej książki
-        if (current->authorName.find(charToAvoidInAuthorsName) == std::string::npos && current->next != nullptr) {
-            // Tworzenie nowego węzła z danymi z newBookData
-            Book *newBook = new Book(newBookData);
-            newBook->next = current->next;
-            current->next = newBook;
-            current = newBook->next; // Przeskoczenie nowo dodanej książki
-        } else {
-            current = current->next;
+        Book *next = current->next;
+        if (isNewBookToAdd(current)) {
+            auto [pagesCount, title, authorsName, authorsSurname, n] = newBook;
+            Book *newBookPtr = new Book{pagesCount, title, authorsName, authorsSurname, n};
+            insertElement<Book>(head, newBookPtr, index);
+            index++;
         }
+        current = next;
+        index++;
     }
-
-    printList(head);
+    printList(head, "New book(s) added:");
 }
 
 int main() {
-    string fileName;
+    string fileName = "data.csv";
     cout << "Enter file name: ";
     cin >> fileName;
 
@@ -140,10 +172,20 @@ int main() {
 
     file.close();
 
-    printList(head);
+    Book newBook;
+    cout << "Enter data about new book:" << endl;
+    cout << "Title: ";
+    cin >> newBook.title;
+    cout << "Number of pages: ";
+    cin >> newBook.pagesCount;
+    cout << "Author's name: ";
+    cin >> newBook.authorName;
+    cout << "Author's surname: ";
+    cin >> newBook.authorSurname;
 
-    Book b = Book{10, "TestTitle", "Test", "Test"};
-    moveAndCreateListItem(head, b, {'[', '['}, 3);
+    printList(head, "Initial list of books:");
+
+    moveAndCreateListItem(head, newBook, {CHAR_TO_AVOID_IN_TITLE, CHAR_TO_AVOID_IN_AUTHORS_NAME}, MOVE_BOOK_INTERVAL);
 
     while (head != nullptr) {
         Book *temp = head;

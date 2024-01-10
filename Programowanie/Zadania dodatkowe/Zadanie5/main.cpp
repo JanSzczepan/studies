@@ -101,10 +101,10 @@ double findMinValue(vector<vector<double>> &A) {
 void fillRowAndColumn(vector<vector<double>> &A, MatrixElement &maxValueElement) {
     auto [maxValue, maxValueRowIndex, maxValueColumnIndex] = maxValueElement;
 
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < N; i++) {
         A[maxValueRowIndex][i] = maxValue;
-    for (int i = 0; i < N; i++)
         A[i][maxValueColumnIndex] = maxValue;
+    }
 }
 
 void writeDataToFile(vector<vector<double>> &A, const string &fileName, int interval) {

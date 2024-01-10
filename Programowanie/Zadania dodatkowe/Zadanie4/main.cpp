@@ -5,7 +5,7 @@
 
 using namespace std;
 
-const int W = 2;
+const int W = 3;
 const int K = 4;
 const int SZ = 6;
 
@@ -51,19 +51,19 @@ void calculateAverages(double (&grades)[w][k], double (&averages)[k]) {
     }
 }
 
-template<size_t k>
-void moveMaxElementToEnd(double (&averages)[k], double (&sortedAverages)[k]) {
-    copy(averages, averages + K, sortedAverages);
-    auto maxPtr = std::max_element(sortedAverages, sortedAverages + K);
-    if (maxPtr != (sortedAverages + K - 1))
-        std::iter_swap(maxPtr, sortedAverages + K - 1);
+template<size_t w, size_t k>
+void moveMaxAverageColumnToEnd(double (&grades)[w][k], double (&averages)[k]) {
+    int maxIndex = distance(averages, max_element(averages, averages + k));
+    for (int i = 0; i < w; i++) {
+        swap(grades[i][maxIndex], grades[i][k - 1]);
+    }
+    swap(averages[maxIndex], averages[k - 1]);
 }
 
 template<size_t w, size_t k>
-void printData(double (&grades)[w][k], double (&averages)[k], double (&sortedAverages)[k]) {
+void printData(double (&grades)[w][k], double (&averages)[k]) {
     printGrades(grades);
     printAverages(averages);
-    printAverages(sortedAverages);
 }
 
 int main() {
@@ -76,10 +76,11 @@ int main() {
     double averages[K];
     calculateAverages(grades, averages);
 
-    double sortedAverages[K];
-    moveMaxElementToEnd(averages, sortedAverages);
+    printData(grades, averages);
 
-    printData(grades, averages, sortedAverages);
+    moveMaxAverageColumnToEnd(grades, averages);
+
+    printData(grades, averages);
 
     return 0;
 }

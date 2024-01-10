@@ -149,7 +149,7 @@ void moveAndCreateListItem(Book *&head, Book &newBook, ExclusionChars exclusionC
 }
 
 int main() {
-    string fileName = "data.csv";
+    string fileName;
     cout << "Enter file name: ";
     cin >> fileName;
 

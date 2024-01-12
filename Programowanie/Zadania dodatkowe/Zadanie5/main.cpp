@@ -13,7 +13,7 @@ struct MatrixElement {
     int columnIndex;
 };
 
-const int N = 5;
+const int N = 6;
 const double X = 1.5;
 const int M = 1;
 const int D = 5;
@@ -56,17 +56,16 @@ ifstream openFile() {
 }
 
 void readDataFromFile(vector<vector<double>> &A, ifstream &file) {
-    int i = 0;
-    string line;
-    while (getline(file, line) && i < N) {
-        istringstream iss(line);
-        int j = 0;
-        string temp;
-        while (iss >> temp && j < N) {
-            A[i][j] = stod(temp);
-            j++;
+    double temp;
+    int i = 0, j = 0;
+    while (file >> temp) {
+        A[i][j] = temp;
+        if (++j == N) {
+            j = 0;
+            if (++i == N) {
+                break;
+            }
         }
-        i++;
     }
 }
 
